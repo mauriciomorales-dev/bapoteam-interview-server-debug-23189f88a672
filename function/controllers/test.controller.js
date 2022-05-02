@@ -19,16 +19,37 @@ async function testFunction(req, res) {
 		
 		let tree = [];
 		// write some code here to make a tree structure
-		
+
+		const categoriesData = categories.data;
+		const idMapping = categoriesData.reduce((acc, el, i) => {
+			acc[el.id] = i;
+			return acc;
+		  }, {});
+		  
+		  categoriesData.forEach(function (el) {
+			console.log(el.name);
+			// Handle the tree root element
+			if (el.parent_id === 0) {
+			  tree.push(el);
+			  return;
+			}
+			// Use our mapping to locate the parent element in our data array
+			const parentEl = categoriesData[idMapping[el.parent_id]];
+			// Add our current el to its parent's `children` array
+			parentEl.children = [...(parentEl.children || []), el];
+		  });
+
 		res.send({
 			sucess: true,
-			categories
+			tree
 		})
+		
 	}
 
 	catch(e) {
 		generalService.processError(res, e);
 	}
+
 }
 
 module.exports = {
